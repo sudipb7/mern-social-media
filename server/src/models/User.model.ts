@@ -9,6 +9,7 @@ export interface UserType extends mongoose.Document {
   profession?: string;
   location?: string;
   link?: string;
+  impressions: number;
   verified: boolean;
   createdAt: Date;
   img?: { secure_url: string; public_id: string };
@@ -42,6 +43,10 @@ const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+  },
+  impressions: {
+    type: Number,
+    default: 0,
   },
   verified: {
     type: Boolean,

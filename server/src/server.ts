@@ -7,6 +7,8 @@ import { v2 as cloudinary } from "cloudinary";
 import { connectToDB } from "./utils/db";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
+import postRoutes from "./routes/post";
+import { errorHandler } from "./middlewares/errorHandler";
 
 const app = express();
 
@@ -20,24 +22,27 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Middlewares
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-app.use(cors());
 app.use(cookieParser());
 
-app.get("/", (req: express.Request, res: express.Response) => {
-  try {
-    res.send("Hello");
-  } catch (error: any) {
-    console.log(error);
-  }
-});
+// Error handling
+app.use(errorHandler);
 
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/post", postRoutes);
 
-connectToDB().then(() => {
-  app.listen(process.env.PORT, () => {
+connectToDB().then((): void => {
+  app.listen(process.env.PORT, (): void => {
     console.log(`We are live at port - ${process.env.PORT}`);
   });
 });

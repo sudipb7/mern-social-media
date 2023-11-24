@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { authenticate } from "../middlewares/index";
+import { authenticate } from "../middlewares/authenticate";
 import {
   getFollowingAndFollowers,
   getUser,
@@ -12,7 +12,7 @@ const router = Router();
 
 router.route("/profile/:username").get(getUser);
 
-router.route("/:id").get(authenticate, getUser).patch(authenticate, updateUser);
+router.route("/:id").patch(authenticate, updateUser);
 
 router.route("/followers/:userId").get(authenticate, getFollowingAndFollowers);
 

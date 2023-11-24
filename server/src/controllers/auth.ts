@@ -1,44 +1,42 @@
-import { Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { v2 as cloudinary } from "cloudinary";
+import createHttpError from "http-errors";
 
-import User, { UserType } from "../models/User.model";
+import User from "../models/User.model";
+import { RequestBody } from "../middlewares/authenticate";
+import asyncHandler from "../utils/asyncHandler";
+import uploadImage from "../utils/uploadImage";
 
-export const register = async (req: Request, res: Response): Promise<void> => {
-  try {
+const COOKIE_OPTIONS = {
+  expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  httpOnly: true,
+  path: "/",
+};
+
+export const register = asyncHandler(
+  async (
+    req: RequestBody,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     const { name, username, email, password, file } = req.body;
 
     const usernameExists = await User.findOne({ username });
+    if (usernameExists) return next(createHttpError(403, "Username is already taken"));
     const emailExists = await User.findOne({ email });
+    if (emailExists) return next(createHttpError(403, "Email is already in use"));
 
-    if (usernameExists || emailExists) {
-      res
-        .status(403)
-        .json({ message: "User with these credentials already exists" });
-      return;
+    let img;
+    if (file) {
+      const result = await uploadImage(file, "Avatars");
+      if (typeof result === "string")
+        return next(createHttpError(400, "Unknown error occured"));
+      img = result;
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
-    let img: null | { public_id: string; secure_url: string } = null;
-    if (file) {
-      await cloudinary.uploader
-        .upload(file, {
-          folder: "Avatars",
-        })
-        .then((res) => {
-          img = {
-            public_id: res.public_id,
-            secure_url: res.secure_url,
-          };
-        })
-        .catch((err: any) => {
-          res.status(400).json({ message: err.message });
-        });
-    }
-
     const user = new User({
       name,
       username,
@@ -48,53 +46,34 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     });
     await user.save();
 
-    const secret = process.env.JWT_SECRET as string;
-    const token = jwt.sign({ id: user._id }, secret);
-
-    res
-      .status(201)
-      .cookie("token", token, {
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        httpOnly: true,
-        path: "/",
-      })
-      .json({ message: "User registered successfully" });
-  } catch (error: any) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-export const login = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { username, password } = req.body;
-
-    const user = (await User.findOne({ username }).select(
-      "+password"
-    )) as UserType | null;
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
-
-    const comparePass = await bcrypt.compare(password, user.password!);
-    if (!comparePass) {
-      res.status(403).json({ message: "Incorrect password" });
-      return;
-    }
-
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!);
 
     res
       .status(201)
-      .cookie("token", token, {
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        httpOnly: true,
-        path: "/",
-      })
-      .json({ message: "Login successfull" });
-  } catch (error: any) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
+      .cookie("token", token, COOKIE_OPTIONS)
+      .json({ message: "User registered successfully" });
   }
-};
+);
+
+export const login = asyncHandler(
+  async (
+    req: RequestBody,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ username }).select("+password");
+    if (!user) return next(createHttpError(404, "User not found"));
+
+    const comparePass = await bcrypt.compare(password, user.password!);
+    if (!comparePass) return next(createHttpError(403, "Incorrect password"));
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!);
+
+    res
+      .status(200)
+      .cookie("token", token, COOKIE_OPTIONS)
+      .json({ message: "Login successfull" });
+  }
+);
