@@ -1,10 +1,23 @@
 import { NextFunction, Response } from "express";
-import createHttpError from "http-errors";
 
 import User, { UserType } from "../models/User.model";
 import { RequestBody } from "../middlewares/authenticate";
 import { formatUsers } from "../utils/user";
 import asyncHandler from "../utils/asyncHandler";
+
+export const currentUser = asyncHandler(
+  async (
+    req: RequestBody,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const user: UserType | null = await User.findById(req.userId);
+    if (!user) {
+      return next(res.status(404).json({ message: "User not found" }));
+    }
+    res.status(200).json(user);
+  }
+);
 
 export const getUser = asyncHandler(
   async (
@@ -13,7 +26,9 @@ export const getUser = asyncHandler(
     next: NextFunction
   ): Promise<void> => {
     const user: UserType | null = await User.findOne({ username: req.params.username });
-    if (!user) return next(createHttpError(404, "User not found"));
+    if (!user) {
+      return next(res.status(404).json({ message: "User not found" }));
+    }
     if (req.username !== req.params.username) {
       user.impressions += 1;
       await user.save();
@@ -30,10 +45,14 @@ export const updateUser = asyncHandler(
   ): Promise<void> => {
     const { name, link, profession, location, bio } = req.body;
 
-    if (req.userId !== req.params.id) return next(createHttpError(403, "Not allowed"));
+    if (req.userId !== req.params.id) {
+      return next(res.status(403).json({ message: "Not allowed" }));
+    }
 
     const user: UserType | null = await User.findById(req.params.id);
-    if (!user) return next(createHttpError(404, "User not found"));
+    if (!user) {
+      return next(res.status(404).json({ message: "User not found" }));
+    }
 
     user.name = name;
     user.link = link;
@@ -53,10 +72,12 @@ export const getFollowingAndFollowers = asyncHandler(
     next: NextFunction
   ): Promise<void> => {
     const user: UserType | null = await User.findById(req.params.userId);
-    if (!user) return next(createHttpError(404, "User not found"));
+    if (!user) {
+      return next(res.status(404).json({ message: "User not found" }));
+    }
 
-    const followersPromises = await Promise.all(user.followers.map(id => User.findById(id)));
-    const followingsPromises = await Promise.all(user.followings.map(id => User.findById(id)));
+    const followersPromises = await Promise.all(user.followers.map((id) => User.findById(id)));
+    const followingsPromises = await Promise.all(user.followings.map((id) => User.findById(id)));
 
     const followers = formatUsers(followersPromises);
     const followings = formatUsers(followingsPromises);
@@ -72,11 +93,15 @@ export const toggleFollowers = asyncHandler(
     next: NextFunction
   ): Promise<void> => {
     const { userId, friendId } = req.params;
-    if (req.userId !== userId) return next(createHttpError(403, "Not allowed"));
+    if (req.userId !== userId) {
+      return next(res.status(403).json({ message: "Not allowed" }));
+    }
 
     const loggedInUser: UserType | null = await User.findById(userId);
     const friend: UserType | null = await User.findById(friendId);
-    if (!friend || !loggedInUser) return next(createHttpError(404, "User not found"));
+    if (!friend || !loggedInUser) {
+      return next(res.status(404).json({ message: "User not found" }));
+    }
 
     const isFollowing: boolean = loggedInUser.followings.includes(friendId);
     if (isFollowing) {

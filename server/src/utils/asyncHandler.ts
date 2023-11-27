@@ -1,6 +1,5 @@
 import { Response, NextFunction } from "express";
 import { RequestBody } from "../middlewares/authenticate";
-import createHttpError from "http-errors";
 
 type Func = (
   req: RequestBody,
@@ -19,7 +18,7 @@ const asyncHandler = (func: Func) => {
       console.log(error);
       let statusCode = 500;
       let errorMessage = error instanceof Error ? error.message : "Server Error";
-      return next(createHttpError(statusCode, errorMessage));
+      return res.status(statusCode).json({ message: errorMessage });
     });
 };
 

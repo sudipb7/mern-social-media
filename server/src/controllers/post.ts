@@ -1,5 +1,4 @@
 import { NextFunction, Response } from "express";
-import createHttpError from "http-errors";
 
 import User, { UserType } from "../models/User.model";
 import Post, { PostType } from "../models/Post.model";
@@ -16,13 +15,19 @@ export const createPost = asyncHandler(
   ): Promise<void> => {
     const { text, files } = req.body;
     const user: UserType | null = await User.findById(req.userId);
-    if (!user) return next(createHttpError(404, "User not found"));
+    if (!user) {
+      return next(res.status(404).json({ message: "User not found" }));
+    }
     let images: Array<{ secure_url: string; public_id: string }> = [];
 
     if (files) {
       const uploadAndUpdate = async (file: string) => {
         const response: any = await uploadImage(file, "Posts");
-        if (typeof response === "string") return next(createHttpError(400, "Unknown error occured"));
+        if (typeof response === "string") {
+          return next(
+            res.status(400).json({ message: "Unknown error occured" })
+          );
+        }
         images.push({
           secure_url: response.secure_url,
           public_id: response.public_id,
@@ -57,10 +62,14 @@ export const updatePost = asyncHandler(
   ): Promise<void> => {
     const { text } = req.body;
     const post = await Post.findById(req.params.id).populate("author") as PostType | null;
-    if (!post) return next(createHttpError(404, "Post not found"));
+    if (!post) {
+      return next(res.status(404).json({ message: "Post not found" }));
+    }
 
     let postAuthor = post.author as UserType;
-    if (req.userId !== postAuthor._id.toString()) return next(createHttpError(403, "Not allowed"));
+    if (req.userId !== postAuthor._id.toString()) {
+      return next(res.status(403).json({ message: "Not allowed" }));
+    }
 
     post.text = text;
     await post.save();

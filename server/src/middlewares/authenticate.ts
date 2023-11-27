@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import createHttpError from "http-errors";
 import { Request, Response, NextFunction } from "express";
 
 import asyncHandler from "../utils/asyncHandler";
@@ -16,14 +15,14 @@ export const authenticate = asyncHandler(
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    const token = req.cookies.token;
-    if (!token) return next(createHttpError(401, "Unauthorized"));
+    const token = req.headers['authorization'];
+    if (!token) return next(res.status(401).json({ message: "Unauthorized" }));
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
     const user: UserType | null = await User.findById(decoded.id);
     if (!user) {
       res.clearCookie("token");
-      return next(createHttpError(404, "User not found"));
+      return next(res.status(404).json({ message: "User not found" }));
     }
 
     req.userId = user._id.toString();

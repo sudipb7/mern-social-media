@@ -13,6 +13,7 @@ export interface UserType extends mongoose.Document {
   verified: boolean;
   createdAt: Date;
   img?: { secure_url: string; public_id: string };
+  coverImg?: { secure_url: string; public_id: string };
   posts: Array<mongoose.Schema.Types.ObjectId>;
   likesPosts: Array<mongoose.Schema.Types.ObjectId>;
   bookmarks: Array<mongoose.Schema.Types.ObjectId>;
@@ -37,6 +38,10 @@ const UserSchema = new mongoose.Schema({
     select: false,
   },
   img: {
+    secure_url: { type: String },
+    public_id: { type: String },
+  },
+  coverImg: {
     secure_url: { type: String },
     public_id: { type: String },
   },

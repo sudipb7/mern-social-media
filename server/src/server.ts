@@ -8,7 +8,6 @@ import { connectToDB } from "./utils/db";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/user";
 import postRoutes from "./routes/post";
-import { errorHandler } from "./middlewares/errorHandler";
 
 const app = express();
 
@@ -32,9 +31,6 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
-
-// Error handling
-app.use(errorHandler);
 
 // Routes
 app.use("/api/auth", authRoutes);
