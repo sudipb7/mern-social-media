@@ -1,9 +1,13 @@
-import type { User } from "@/lib/types";
-import { ModeToggle } from "../mode-toggle";
-import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
-import MobileMenu from "./MobileMenu";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
-const Topbar = ({ user }: { user: User }) => {
+import { ModeToggle } from "../mode-toggle";
+import MobileMenu from "./MobileMenu";
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+
+const Topbar = () => {
+  const user = useSelector((state: RootState) => state.auth?.user);
+
   return (
     <header className="w-full py-2 px-6 max-sm:flex hidden justify-between items-center sticky top-0 left-0">
       <Sheet>
@@ -17,7 +21,7 @@ const Topbar = ({ user }: { user: User }) => {
           />
         </SheetTrigger>
         <SheetContent side="left">
-          <MobileMenu user={user} />
+          <MobileMenu user={user!} />
         </SheetContent>
       </Sheet>
       <img

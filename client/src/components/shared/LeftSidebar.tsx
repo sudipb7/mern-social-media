@@ -1,17 +1,54 @@
-import { useLocation, Link } from "react-router-dom";
-import { Bookmark, Home, ImagePlus, Settings, User } from "lucide-react";
+import { useLocation, Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useTheme } from "@/context/theme-provider";
+import { setLogout } from "@/redux/slices/auth";
 import type { User as PropTypes } from "@/lib/types";
 
+import { Button } from "../ui/button";
+import {
+  Bookmark,
+  Home,
+  LogOut,
+  MonitorSmartphone,
+  Moon,
+  Settings,
+  Sun,
+  User,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+
 const LeftSidebar = ({ user }: { user: PropTypes }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { pathname } = useLocation();
+  const { setTheme } = useTheme();
 
   const navLinks = [
     { route: "/home", label: "Home", icon: Home },
-    { route: "/create", label: "Create", icon: ImagePlus },
     { route: "/bookmarks", label: "Bookmarks", icon: Bookmark },
     { route: `/profile/${user?.username}`, label: "Profile", icon: User },
     { route: "/settings", label: "Settings", icon: Settings },
   ];
+
+  const handleLogout = () => {
+    dispatch(setLogout());
+    localStorage.removeItem("token");
+    navigate(0);
+  };
 
   return (
     <header className="max-sm:hidden w-fit lg:w-[300px] xl:w-[340px] p-3 md:p-5 lg:p-3 h-screen border-r sticky top-0 left-0 flex justify-start items-start">
@@ -40,6 +77,85 @@ const LeftSidebar = ({ user }: { user: PropTypes }) => {
             <span className="mr-1.5 max-lg:hidden">{link.label}</span>
           </Link>
         ))}
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="p-6 py-5 lg:py-3.5 rounded-full hover:bg-muted flex items-center transition-all ease-in-out duration-200">
+              <Sun className="mr-3 dark:hidden" />
+              <Moon className="mr-3 hidden dark:block" />
+              <span className="mr-1.5 max-lg:hidden">Display</span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem
+              className="flex items-center"
+              onClick={() => setTheme("light")}
+            >
+              <Sun size={18} className="mr-3" />
+              <span>Light</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="flex items-center"
+              onClick={() => setTheme("dark")}
+            >
+              <Moon size={18} className="mr-3" />
+              <span>Dark</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="flex items-center"
+              onClick={() => setTheme("system")}
+            >
+              <MonitorSmartphone size={18} className="mr-3" />
+              <span>System</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="p-6 py-5 lg:py-3.5 rounded-full hover:bg-muted flex items-center transition-all ease-in-out duration-200">
+              <LogOut className="mr-3" />
+              <span className="mr-1.5 max-lg:hidden">Log out</span>
+            </button>
+          </DialogTrigger>
+          <DialogContent className="w-[300px] rounded-xl">
+            <DialogHeader className="my-2">
+              <img
+                src="/logo.svg"
+                alt="X Logo"
+                width={30}
+                height={30}
+                className="mx-auto mb-3 dark:invert"
+              />
+              <DialogTitle className="text-3xl text-justify font-bold">
+                Log out of X?
+              </DialogTitle>
+              <DialogDescription>
+                You can always log back in at any time.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="w-full flex flex-col gap-3">
+              <Button
+                variant="destructive"
+                size="lg"
+                className="rounded-full font-medium"
+                onClick={handleLogout}
+              >
+                Log out
+              </Button>
+              <DialogClose asChild>
+                <Button
+                  size="lg"
+                  className="rounded-full font-medium"
+                  variant="outline"
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
+            </div>
+          </DialogContent>
+        </Dialog>
       </nav>
     </header>
   );

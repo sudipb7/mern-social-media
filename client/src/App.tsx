@@ -5,12 +5,12 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { setAuth, setLogout, setUser } from "./redux/slices/auth";
 import type { RootState } from "./redux/store";
 
-import Auth from "./routes/Auth";
-import Home from "./routes/Home";
 import LeftSidebar from "./components/shared/LeftSidebar";
 import RightSidebar from "./components/shared/RightSidebar";
-import Topbar from "./components/shared/Topbar";
 import BottomBar from "./components/shared/BottomBar";
+import Auth from "./routes/Auth";
+import Home from "./routes/Home";
+import Profile from "./routes/Profile";
 
 export default function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -63,10 +63,9 @@ export default function App() {
           />
         </div>
       ) : (
-        <div className="flex flex-row">
+        <div className="flex flex-row justify-center">
           {token && <LeftSidebar user={user!} />}
-          <main className="flex-1">
-            {token && <Topbar user={user!} />}
+          <main className="flex-1 max-w-[650px]">
             <Routes>
               <Route
                 path="/"
@@ -75,6 +74,10 @@ export default function App() {
               <Route
                 path="/home"
                 element={token ? <Home /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/profile/:username"
+                element={token ? <Profile /> : <Navigate to="/" />}
               />
             </Routes>
             {token && <BottomBar user={user!} />}
