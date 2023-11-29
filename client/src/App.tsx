@@ -11,6 +11,7 @@ import BottomBar from "./components/shared/BottomBar";
 import Auth from "./routes/Auth";
 import Home from "./routes/Home";
 import Profile from "./routes/Profile";
+import CreatePost from "./routes/CreatePost";
 
 export default function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -78,6 +79,10 @@ export default function App() {
               <Route
                 path="/profile/:username"
                 element={token ? <Profile /> : <Navigate to="/" />}
+              />
+              <Route
+                path="/create"
+                element={token ? <CreatePost /> : <Navigate to="/" />}
               />
             </Routes>
             {token && <BottomBar user={user!} />}

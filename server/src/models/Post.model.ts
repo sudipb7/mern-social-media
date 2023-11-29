@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 import { UserType } from "./User.model";
 
 export interface PostType extends mongoose.Document {
-  text?: string;
+  text: string;
   pinned: boolean;
   impressions: number;
   createdAt: Date;
-  files?: { secure_url: string; public_id: string };
+  image?: { secure_url: string; public_id: string };
   author: mongoose.Schema.Types.ObjectId | UserType;
   parentId: mongoose.Schema.Types.ObjectId | PostType;
   likes: Array<mongoose.Schema.Types.ObjectId | UserType>;
@@ -15,7 +15,7 @@ export interface PostType extends mongoose.Document {
 }
 
 const PostSchema = new mongoose.Schema({
-  text: { type: String },
+  text: { type: String, required: true },
   parentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Post",
@@ -25,12 +25,10 @@ const PostSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  files: [
-    {
-      public_id: { type: String },
-      secure_url: { type: String },
-    },
-  ],
+  image: {
+    public_id: { type: String },
+    secure_url: { type: String },
+  },
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,

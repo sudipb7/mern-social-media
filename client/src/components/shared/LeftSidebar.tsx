@@ -7,6 +7,7 @@ import type { User as PropTypes } from "@/lib/types";
 import { Button } from "../ui/button";
 import {
   Bookmark,
+  Feather,
   Home,
   LogOut,
   MonitorSmartphone,
@@ -30,6 +31,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import CreatePostForm from "../forms/CreatePostForm";
 
 const LeftSidebar = ({ user }: { user: PropTypes }) => {
   const navigate = useNavigate();
@@ -51,7 +53,7 @@ const LeftSidebar = ({ user }: { user: PropTypes }) => {
   };
 
   return (
-    <header className="max-sm:hidden w-fit lg:w-[300px] xl:w-[340px] p-3 md:p-5 lg:p-3 h-screen border-r sticky top-0 left-0 flex justify-start items-start">
+    <header className="max-sm:hidden w-fit lg:w-[300px] xl:w-[340px] p-3 h-screen border-r sticky top-0 left-0 flex justify-start items-start">
       <nav className="max-lg:w-full mx-auto flex flex-col justify-center max-md:items-center items-start gap-2">
         <Link className="px-6 py-4 my-4" to="/home">
           <img
@@ -81,8 +83,8 @@ const LeftSidebar = ({ user }: { user: PropTypes }) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="p-6 py-5 lg:py-3.5 rounded-full hover:bg-muted flex items-center transition-all ease-in-out duration-200">
-              <Sun className="mr-3 dark:hidden" />
-              <Moon className="mr-3 hidden dark:block" />
+              <Sun className="lg:mr-3 dark:hidden" />
+              <Moon className="lg:mr-3 hidden dark:block" />
               <span className="mr-1.5 max-lg:hidden">Display</span>
             </button>
           </DropdownMenuTrigger>
@@ -114,7 +116,7 @@ const LeftSidebar = ({ user }: { user: PropTypes }) => {
         <Dialog>
           <DialogTrigger asChild>
             <button className="p-6 py-5 lg:py-3.5 rounded-full hover:bg-muted flex items-center transition-all ease-in-out duration-200">
-              <LogOut className="mr-3" />
+              <LogOut className="lg:mr-3" />
               <span className="mr-1.5 max-lg:hidden">Log out</span>
             </button>
           </DialogTrigger>
@@ -154,6 +156,20 @@ const LeftSidebar = ({ user }: { user: PropTypes }) => {
                 </Button>
               </DialogClose>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="mt-3 w-fit lg:w-full hidden sm:block py-4 px-5 lg:py-3.5 rounded-full text-white bg-[#1D9BF0] hover:bg-[#1A8CD8] transition-all ease-linear duration-200">
+              <Feather className="lg:hidden w-full text-center" size={20} />
+              <span className="max-lg:hidden w-full text-center font-semibold">
+                Post
+              </span>
+            </button>
+          </DialogTrigger>
+          <DialogContent className="max-w-[450px]">
+            <CreatePostForm />
           </DialogContent>
         </Dialog>
       </nav>

@@ -1,3 +1,4 @@
+import { v2 as cloudinary } from "cloudinary";
 import { NextFunction, Response } from "express";
 
 import User, { UserType } from "../models/User.model";
@@ -5,7 +6,6 @@ import Post, { PostType } from "../models/Post.model";
 import { RequestBody } from "../middlewares/authenticate";
 
 import asyncHandler from "../utils/asyncHandler";
-import uploadImage from "../utils/uploadImage";
 
 export const createPost = asyncHandler(
   async (
@@ -13,37 +13,27 @@ export const createPost = asyncHandler(
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    const { text, files } = req.body;
+    const { text, file } = req.body;
     const user: UserType | null = await User.findById(req.userId);
     if (!user) {
       return next(res.status(404).json({ message: "User not found" }));
     }
-    let images: Array<{ secure_url: string; public_id: string }> = [];
+    let image: { secure_url: string; public_id: string } | null = null;
 
-    if (files) {
-      const uploadAndUpdate = async (file: string) => {
-        const response: any = await uploadImage(file, "Posts");
-        if (typeof response === "string") {
-          return next(
-            res.status(400).json({ message: "Unknown error occured" })
-          );
-        }
-        images.push({
-          secure_url: response.secure_url,
-          public_id: response.public_id,
-        });
+    if (file) {
+      const response = await cloudinary.uploader.upload(file, {
+        folder: "Posts",
+      });
+
+      image = {
+        secure_url: response.secure_url,
+        public_id: response.public_id,
       };
-      // Handling both single and multiple files upload
-      if (files instanceof Array) {
-        await Promise.all(files.map((file) => uploadAndUpdate(file)));
-      } else {
-        await uploadAndUpdate(files);
-      }
     }
 
     const newPost = new Post({
-      text,
-      files: images,
+      text: text,
+      image: image,
       author: req.userId,
     });
     const post: PostType = await newPost.save();

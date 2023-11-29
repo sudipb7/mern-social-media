@@ -21,7 +21,6 @@ export const authenticate = asyncHandler(
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
     const user: UserType | null = await User.findById(decoded.id);
     if (!user) {
-      res.clearCookie("token");
       return next(res.status(404).json({ message: "User not found" }));
     }
 

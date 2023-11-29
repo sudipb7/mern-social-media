@@ -26,7 +26,7 @@ export interface Post {
   pinned: boolean;
   impressions: number;
   createdAt: Date;
-  files?: { secure_url: string; public_id: string };
+  image?: { secure_url: string; public_id: string };
   author: User | string;
   parentId: Post | string;
   likes: Array<string | User>;

@@ -33,7 +33,6 @@ export default function Profile() {
   const [profile, setProfile] = useState<User | null>(null);
 
   const currentUser = useSelector((state: RootState) => state.auth?.user);
-  const token = useSelector((state: RootState) => state.auth?.token);
   const joinedAt = dateFormatter(`${profile?.createdAt}`);
 
   const details: { icon: LucideIcon; value: string | null | undefined }[] = [
@@ -42,6 +41,13 @@ export default function Profile() {
     { icon: MapPin, value: profile?.location },
     { icon: LinkIcon, value: profile?.link },
     { icon: CalendarDaysIcon, value: `Joined ${joinedAt}` },
+  ];
+
+  const tabLists = [
+    { value: "posts", label: "Posts", routes: "/" },
+    { value: "replies", label: "Replies", routes: "/replies" },
+    { value: "media", label: "Media", routes: "/media" },
+    { value: "likedPosts", label: "Likes", routes: "/liked" },
   ];
 
   const getUser = async (): Promise<void> => {
@@ -53,7 +59,7 @@ export default function Profile() {
         }`,
         {
           method: "GET",
-          headers: { authorization: token! },
+          headers: { authorization: localStorage.getItem("token")! },
         }
       );
       const data = await response.json();
