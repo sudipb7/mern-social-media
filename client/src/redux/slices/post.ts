@@ -1,4 +1,4 @@
-import { Post } from "@/lib/types";
+import type { Post } from "@/lib/types";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 type State = {
@@ -17,7 +17,7 @@ const postSlice = createSlice({
       state.posts = action.payload;
     },
     addPost: (state, action: PayloadAction<Post>) => {
-      state.posts.unshift(action.payload);
+      state.posts.push(action.payload);
     },
     updatePost: (state, action: PayloadAction<Post>) => {
       const updatedPosts = state.posts.map((post: Post) => {

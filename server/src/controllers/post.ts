@@ -7,6 +7,83 @@ import { RequestBody } from "../middlewares/authenticate";
 
 import asyncHandler from "../utils/asyncHandler";
 
+export const getPosts = asyncHandler(
+  async (
+    req: RequestBody,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const page = +req.query.page! ?? 1;
+    const pageSize = +req.query.pageSize! ?? 3;
+
+    const skipAmount = (page - 1) * pageSize;
+    const postsQuery = Post.find({ parentId: { $in: [null, undefined] } })
+      .sort({ createdAt: "descending" })
+      .skip(skipAmount)
+      .limit(pageSize)
+      .populate({
+        path: "author",
+        model: User,
+      });
+
+    const posts = (await postsQuery.exec()) as PostType[] | null;
+    if (!posts) {
+      return next(res.status(404).json({ message: "Posts not found" }));
+    }
+
+    const totalPosts = await Post.countDocuments({
+      parentId: { $in: [null, undefined] },
+    });
+    const totalPages = Math.ceil(totalPosts / pageSize);
+    const isNext = page <= totalPages;
+
+    res.status(200).json({
+      page,
+      pageSize,
+      totalPages,
+      totalPosts,
+      isNext,
+      posts,
+    });
+  }
+);
+
+export const getPostById = asyncHandler(
+  async (
+    req: RequestBody,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const post = await Post.findById(req.params.id)
+      .populate({
+        path: "author",
+        model: User,
+      })
+      .populate({
+        path: "children", // populate the children field
+        populate: [
+          {
+            path: "author", // Populate the author field within children
+            model: User,
+          },
+          {
+            path: "children", // Populate the children field within children
+            model: Post, // The model of the nested children (assuming it's the same "Thread" model)
+            populate: {
+              path: "author", // Populate the author field within nested children
+              model: User,
+            },
+          },
+        ],
+      })
+      .exec();
+    if (!post) {
+      return next(res.status(404).json({ message: "Post not found" }));
+    }
+    res.status(200).json({ message: "Post fetched successfully", post });
+  }
+);
+
 export const createPost = asyncHandler(
   async (
     req: RequestBody,
