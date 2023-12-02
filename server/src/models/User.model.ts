@@ -15,7 +15,7 @@ export interface UserType extends mongoose.Document {
   img?: { secure_url: string; public_id: string };
   coverImg?: { secure_url: string; public_id: string };
   posts: Array<mongoose.Schema.Types.ObjectId>;
-  likesPosts: Array<mongoose.Schema.Types.ObjectId>;
+  likedPosts: Array<mongoose.Schema.Types.ObjectId>;
   bookmarks: Array<mongoose.Schema.Types.ObjectId>;
   followers: Array<mongoose.Schema.Types.ObjectId | UserType | string>;
   followings: Array<mongoose.Schema.Types.ObjectId | UserType | string>;

@@ -1,4 +1,5 @@
 import { NextFunction, Response } from "express";
+import { v2 as cloudinary } from "cloudinary";
 
 import User, { UserType } from "../models/User.model";
 import { RequestBody } from "../middlewares/authenticate";
@@ -62,6 +63,72 @@ export const updateUser = asyncHandler(
     await user.save();
 
     res.status(200).json({ message: "Profile updated successfully", user });
+  }
+);
+
+export const updateAvatar = asyncHandler(
+  async (
+    req: RequestBody,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    if (req.userId !== req.params.id) {
+      return next(res.status(403).json({ message: "Not allowed" }));
+    }
+    const user: UserType | null = await User.findById(req.params.id);
+    if (!user) {
+      return next(res.status(404).json({ message: "User not found" }));
+    }
+
+    if (user.img?.secure_url) {
+      await cloudinary.uploader.destroy(user.img.public_id);
+    }
+
+    const result = await cloudinary.uploader.upload(req.body.file, {
+      folder: "Avatars",
+    });
+    if (!result.secure_url) {
+      return next(res.status(400).json({ message: "Failed to upload" }));
+    }
+    user.img = {
+      secure_url: result.secure_url,
+      public_id: result.public_id,
+    };
+    await user.save();
+    res.status(200).json({ message: "Profile picture updated", user });
+  }
+);
+
+export const updateCover = asyncHandler(
+  async (
+    req: RequestBody,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    if (req.userId !== req.params.id) {
+      return next(res.status(403).json({ message: "Not allowed" }));
+    }
+    const user: UserType | null = await User.findById(req.params.id);
+    if (!user) {
+      return next(res.status(404).json({ message: "User not found" }));
+    }
+
+    if (user.coverImg?.secure_url) {
+      await cloudinary.uploader.destroy(user.coverImg.public_id);
+    }
+
+    const result = await cloudinary.uploader.upload(req.body.file, {
+      folder: "Covers",
+    });
+    if (!result.secure_url) {
+      return next(res.status(400).json({ message: "Failed to upload" }));
+    }
+    user.coverImg = {
+      secure_url: result.secure_url,
+      public_id: result.public_id,
+    };
+    await user.save();
+    res.status(200).json({ message: "Cover picture updated", user });
   }
 );
 

@@ -8,10 +8,10 @@ export interface PostType extends mongoose.Document {
   createdAt: Date;
   image?: { secure_url: string; public_id: string };
   author: mongoose.Schema.Types.ObjectId | UserType;
-  parentId: mongoose.Schema.Types.ObjectId | PostType;
-  likes: Array<mongoose.Schema.Types.ObjectId | UserType>;
-  bookmarks: Array<mongoose.Schema.Types.ObjectId | UserType>;
-  children: Array<mongoose.Schema.Types.ObjectId | PostType>;
+  parentId: mongoose.Schema.Types.ObjectId | PostType | string;
+  likes: string[];
+  bookmarks: string[];
+  children: Array<mongoose.Schema.Types.ObjectId | string>;
 }
 
 const PostSchema = new mongoose.Schema({

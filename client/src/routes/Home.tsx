@@ -1,7 +1,7 @@
 import Topbar from "@/components/shared/Topbar";
 import FloatingButton from "@/components/FloatingButton";
 import Header from "@/components/shared/Header";
-import Feed from "@/components/forms/Feed";
+import Feed from "@/components/shared/Feed";
 
 const Home: React.FC = () => {
   return (
