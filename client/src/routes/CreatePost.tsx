@@ -1,7 +1,7 @@
 import CreatePostForm from "@/components/forms/CreatePostForm";
 import Topbar from "@/components/shared/Topbar";
 
-export default function CreatePost() {
+const CreatePost: React.FC = () => {
   return (
     <>
       <Topbar />
@@ -10,4 +10,6 @@ export default function CreatePost() {
       </section>
     </>
   );
-}
+};
+
+export default CreatePost;

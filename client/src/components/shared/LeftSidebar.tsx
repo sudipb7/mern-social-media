@@ -33,7 +33,7 @@ import {
 } from "../ui/dialog";
 import CreatePostForm from "../forms/CreatePostForm";
 
-const LeftSidebar = ({ user }: { user: PropTypes }) => {
+const LeftSidebar: React.FC<{ user: PropTypes }> = ({ user }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { pathname } = useLocation();
@@ -49,7 +49,7 @@ const LeftSidebar = ({ user }: { user: PropTypes }) => {
   const handleLogout = () => {
     dispatch(setLogout());
     localStorage.removeItem("token");
-    navigate(0);
+    navigate("/");
   };
 
   return (

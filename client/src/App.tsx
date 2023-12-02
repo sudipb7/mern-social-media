@@ -13,7 +13,7 @@ import Home from "./routes/Home";
 import Profile from "./routes/Profile";
 import CreatePost from "./routes/CreatePost";
 
-export default function App() {
+const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const token = localStorage.getItem("token");
   const user = useSelector((state: RootState) => state.auth?.user);
@@ -51,6 +51,13 @@ export default function App() {
     // eslint-disable-next-line
   }, []);
 
+  if (!token)
+    return (
+      <Routes>
+        <Route path="/" element={<Auth />} />
+      </Routes>
+    );
+
   return (
     <div>
       {loading ? (
@@ -65,31 +72,21 @@ export default function App() {
         </div>
       ) : (
         <div className="flex flex-row justify-center">
-          {token && <LeftSidebar user={user!} />}
+          {<LeftSidebar user={user!} />}
           <main className="flex-1 max-w-[650px]">
             <Routes>
-              <Route
-                path="/"
-                element={!token ? <Auth /> : <Navigate to="/home" />}
-              />
-              <Route
-                path="/home"
-                element={token ? <Home /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/profile/:username"
-                element={token ? <Profile /> : <Navigate to="/" />}
-              />
-              <Route
-                path="/create"
-                element={token ? <CreatePost /> : <Navigate to="/" />}
-              />
+              <Route path="/" element={<Navigate to="/home" />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/profile/:username" element={<Profile />} />
+              <Route path="/create" element={<CreatePost />} />
             </Routes>
-            {token && <BottomBar user={user!} />}
+            {<BottomBar user={user!} />}
           </main>
-          {token && <RightSidebar />}
+          {<RightSidebar />}
         </div>
       )}
     </div>
   );
-}
+};
+
+export default App;

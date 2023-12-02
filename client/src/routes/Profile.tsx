@@ -22,7 +22,7 @@ import {
   MapPin,
 } from "lucide-react";
 
-export default function Profile() {
+const Profile: React.FC = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -175,4 +175,6 @@ export default function Profile() {
       </section>
     </>
   );
-}
+};
+
+export default Profile;

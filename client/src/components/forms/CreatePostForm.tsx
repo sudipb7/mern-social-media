@@ -20,7 +20,7 @@ import { useToast } from "../ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "@/redux/slices/auth";
 
-const CreatePostForm = () => {
+const CreatePostForm: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -66,7 +66,6 @@ const CreatePostForm = () => {
   async function onSubmit(values: z.infer<typeof createPostValidation>) {
     try {
       setLoading(true);
-      console.log(values);
       const response = await fetch(
         `${import.meta.env.VITE_REACT_BASE_URL}/api/post`,
         {

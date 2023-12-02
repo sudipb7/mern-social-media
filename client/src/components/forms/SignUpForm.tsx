@@ -18,7 +18,7 @@ import { Loader2 } from "lucide-react";
 import { SignUpFormValidation } from "@/lib/validations/UserValidations";
 import { useToast } from "@/components/ui/use-toast";
 
-const SignUpForm = () => {
+const SignUpForm: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -51,6 +51,7 @@ const SignUpForm = () => {
       }
       localStorage.setItem("token", data.token);
       toast({ title: data?.message });
+      navigate("/home");
       navigate(0);
     } catch (error: unknown) {
       toast({ variant: "destructive", title: "Some error occured" });

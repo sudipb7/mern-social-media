@@ -5,11 +5,11 @@ import { ModeToggle } from "../mode-toggle";
 import MobileMenu from "./MobileMenu";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 
-const Topbar = () => {
+const Topbar: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth?.user);
 
   return (
-    <header className="w-full py-2 px-6 max-sm:flex hidden justify-between items-center sticky top-0 left-0">
+    <header className="w-full py-3 px-6 max-sm:flex hidden justify-between items-center sticky top-0 left-0 bg-background border-b z-20">
       <Sheet>
         <SheetTrigger asChild>
           <img

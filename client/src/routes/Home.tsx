@@ -1,15 +1,17 @@
 import Topbar from "@/components/shared/Topbar";
 import FloatingButton from "@/components/FloatingButton";
 import Header from "@/components/shared/Header";
+import Feed from "@/components/forms/Feed";
 
-export default function Home() {
+const Home: React.FC = () => {
   return (
     <>
       <Topbar />
-      <div className="max-sm:hidden w-full">
-        <Header title="Home" />
-      </div>
+      <Header title="Home" isHide={true} />
+      <Feed api="/post" />
       <FloatingButton />
     </>
   );
-}
+};
+
+export default Home;

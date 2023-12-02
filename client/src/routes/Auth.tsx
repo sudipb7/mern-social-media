@@ -3,7 +3,7 @@ import SignUpForm from "@/components/forms/SignUpForm";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
-export default function Auth() {
+const Auth: React.FC = () => {
   return (
     <main className="w-full h-[100dvh] flex justify-center items-center">
       <div className="max-lg:hidden flex justify-center items-center h-full w-2/5 xl:w-1/2 relative p-5">
@@ -78,4 +78,6 @@ export default function Auth() {
       </section>
     </main>
   );
-}
+};
+
+export default Auth;

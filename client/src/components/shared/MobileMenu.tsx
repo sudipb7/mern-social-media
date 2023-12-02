@@ -38,7 +38,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 
-const MobileMenu = ({ user }: { user: PropTypes }) => {
+const MobileMenu: React.FC<{ user: PropTypes }> = ({ user }) => {
   const { setTheme } = useTheme();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ const MobileMenu = ({ user }: { user: PropTypes }) => {
   const handleLogout = () => {
     dispatch(setLogout());
     localStorage.removeItem("token");
-    navigate(0);
+    navigate("/");
   };
 
   return (

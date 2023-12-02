@@ -2,7 +2,7 @@ import { useLocation, Link } from "react-router-dom";
 import { User as PropTypes } from "@/lib/types";
 import { Bookmark, Home, Search, User } from "lucide-react";
 
-const BottomBar = ({ user }: { user: PropTypes }) => {
+const BottomBar: React.FC<{ user: PropTypes }> = ({ user }) => {
   const { pathname } = useLocation();
 
   const navLinks = [
@@ -13,7 +13,7 @@ const BottomBar = ({ user }: { user: PropTypes }) => {
   ];
 
   return (
-    <nav className="max-sm:flex hidden w-full p-1.5 border-t fixed bottom-0 left-0 justify-evenly items-center">
+    <nav className="max-sm:flex hidden w-full p-1.5 border-t fixed bottom-0 left-0 justify-evenly items-center bg-background">
       {navLinks.map((link) => (
         <Link
           key={link.label}
