@@ -17,7 +17,7 @@ router.route("/").get(authenticate, currentUser);
 
 router.route("/profile/:username").get(authenticate, getUser);
 
-router.route("/:id").patch(authenticate, updateUser);
+router.route("/profile/:id").patch(authenticate, updateUser);
 
 router.route("/avatar/:id").patch(authenticate, updateAvatar);
 

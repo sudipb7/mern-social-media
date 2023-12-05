@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { authenticate } from "../middlewares/authenticate";
 import {
+  addReplyToPost,
   createPost,
   getBookmarks,
   getPostById,
@@ -18,6 +19,8 @@ router
   .route("/:id")
   .get(authenticate, getPostById)
   .patch(authenticate, toggleLikes);
+
+router.route("/comment").post(authenticate, addReplyToPost);
 
 router
   .route("/bookmark/:id")

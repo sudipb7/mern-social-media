@@ -12,6 +12,8 @@ import Auth from "./routes/Auth";
 import Home from "./routes/Home";
 import Profile from "./routes/Profile";
 import CreatePost from "./routes/CreatePost";
+import Bookmarks from "./routes/Bookmarks";
+import Post from "./routes/Post";
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -78,7 +80,9 @@ const App: React.FC = () => {
               <Route path="/" element={<Navigate to="/home" />} />
               <Route path="/home" element={<Home />} />
               <Route path="/profile/:username" element={<Profile />} />
+              <Route path="/posts/:id" element={<Post />} />
               <Route path="/create" element={<CreatePost />} />
+              <Route path="/bookmarks" element={<Bookmarks />} />
             </Routes>
             {<BottomBar user={user!} />}
           </main>

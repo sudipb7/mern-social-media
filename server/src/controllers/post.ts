@@ -155,8 +155,8 @@ export const createPost = asyncHandler(
     }
 
     const newPost = new Post({
-      text: text,
-      image: image,
+      text,
+      image,
       author: req.userId,
     });
     const post: PostType = await newPost.save();
@@ -173,7 +173,7 @@ export const toggleLikes = asyncHandler(
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    const post = await Post.findById(req.params.id) as PostType | null;
+    const post = await Post.findById(req.params.id).populate("author") as PostType | null;
     if (!post) {
       return next(res.status(404).json({ message: "Post not found" }));
     }
@@ -203,7 +203,7 @@ export const toggleBookmarks = asyncHandler(
     res: Response,
     next: NextFunction
   ): Promise<void> => {
-    const post = await Post.findById(req.params.id) as PostType | null;
+    const post = await Post.findById(req.params.id).populate("author") as PostType | null;
     if (!post) {
       return next(res.status(404).json({ message: "Post not found" }));
     }
@@ -228,5 +228,51 @@ export const toggleBookmarks = asyncHandler(
       : "Added to your bookmarks";
 
     res.status(200).json({ message, post, user });
+  }
+);
+
+export const addReplyToPost = asyncHandler(
+  async (
+    req: RequestBody,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const { text, file, parentId } = req.body;
+    const user = await User.findById(req.userId) as UserType | null;
+    if(!user) {
+      return next(res.status(404).json({ message: "User not found" }));
+    }
+    const originalPost = await Post.findById(parentId) as PostType | null;
+    if(!originalPost) {
+      return next(res.status(404).json({ message: "Post not found" }));
+    }
+
+    let image: { secure_url: string; public_id: string } | null = null;
+
+    if (file) {
+      const response = await cloudinary.uploader.upload(file, {
+        folder: "Posts",
+      });
+
+      image = {
+        secure_url: response.secure_url,
+        public_id: response.public_id,
+      };
+    }
+
+    const newComment = new Post({
+      parentId,
+      text,
+      image,
+      author: req.userId
+    });
+    const comment: PostType = await newComment.save();
+
+    user.posts.push(comment._id);
+    originalPost.children.push(comment._id);
+
+    await Promise.all([user.save(), originalPost.save()]);
+
+    res.status(201).json({ message: "Your post was sent", user, originalPost, comment });
   }
 );
